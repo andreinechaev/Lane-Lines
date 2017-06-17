@@ -1,6 +1,10 @@
 #include <iostream>
 #include <vector>
 #include "opencv2/opencv.hpp"
+#include "src/calibration/Calibrator.h"
+
+using namespace std::chrono;
+typedef std::chrono::high_resolution_clock hires_clk;
 
 cv::Mat set_color_schema(cv::Mat &image, cv::ColorConversionCodes color_code = cv::COLOR_BGR2GRAY) {
     cv::Mat gray;
@@ -25,65 +29,39 @@ cv::Mat abs_sobel_thresh(cv::Mat &image, char orient='x', int sobel_kernel=3, sh
     return abs_grad;
 }
 
-void get_image_points(std::vector<std::vector<cv::Point2f> > &matrix, cv::Size size = cv::Size(9, 6)) {
-    for (int i = 1; i <= 20; i++) {
-        std::stringstream path;
-        path << "calibration/calibration" << i << ".jpg";
-        auto image = cv::imread(path.str());
-        std::vector<cv::Point2f > points;
-        bool found = cv::findChessboardCorners(
-                image,
-                size,
-                points,
-                cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_NORMALIZE_IMAGE
-        );
-        if (found) matrix.push_back(points);
-    }
-}
-
-void get_object_points(std::vector<std::vector<cv::Point3f> > &obj_points, long images_size=0, cv::Size size = cv::Size(9, 6)) {
-    for (int k = 0; k < images_size; k++) {
-        std::vector<cv::Point3f> obj;
-        for (int i = 0; i < size.height; i++) {
-            for (int j = 0; j < size.width; j++) {
-                obj.push_back(cv::Point3f(i, j, 0));
-            }
-        }
-        obj_points.push_back(obj);
-    }
+void imshow(cv::Mat &image, std::string name) {
+//    cv::namedWindow(name, cv::WINDOW_OPENGL); // required for built from source opencv for anaconda
+    cv::imshow(name, image);
+    cv::waitKey(0);
 }
 
 int main() {
+    auto start = hires_clk::now();
+
     auto size = cv::Size(9, 6);
-    std::vector<std::vector<cv::Point2f> > img_points;
-    get_image_points(img_points);
 
-    std::vector<std::vector<cv::Point3f>> obj_points;
-    get_object_points(obj_points, img_points.size());
-
+    std::string path = "calibration/calibration";
     cv::Mat matrix, distCoef;
-    std::vector<cv::Mat> rvecs, tvecs;
-    cv::calibrateCamera(obj_points, img_points, size, matrix, distCoef, rvecs, tvecs);
+    calibration::Calibrator calibrator(path, 20, size);
+    calibrator.calibrate(matrix, distCoef);
 
-    // Testing undistortion functionality on gotten matrix
-    auto test_img = cv::imread("calibration/calibration2.jpg");
-    cv::Mat dst_img;
-    cv::undistort(test_img, dst_img, matrix, distCoef);
+    auto end = hires_clk::now();
+    auto duration = duration_cast<milliseconds>(end - start).count();
+    std::cout << "Calibration duration: " << duration / 1000.f << " secs \n";
 
-    cv::imshow("Undistorted", dst_img);
-    cv::waitKey(0);
-
-    auto image = cv::imread("data/signs_vehicles_xygrad.png");
-    assert(image.data);
+    auto src_image = cv::imread("data/signs_vehicles_xygrad.png");
+    cv::Mat dst;
+    cv::undistort(src_image, dst, matrix, distCoef);
+    assert(dst.data);
 
 //    cv::GaussianBlur(image, image, cv::Size(3,3), 0);
-    auto gray = set_color_schema(image);
-    cv::imshow("Greyscale", gray);
-    cv::waitKey(0);
+    auto gray = set_color_schema(dst);
+    imshow(gray, "Greyscale");
 
-    auto grad = abs_sobel_thresh(image, 'x', 3);
-    cv::imshow("Grad X", grad);
-    cv::waitKey(0);
+    auto grad = abs_sobel_thresh(dst, 'x', 3);
+    imshow(grad, "Grad X");
+
+    cv::destroyAllWindows();
 
     std::cout << "End of program" << std::endl;
     return 0;
