@@ -10,6 +10,10 @@
 #include <opencv2/opencv.hpp>
 
 namespace calibration {
+    static const std::string MATRIX_KEY = "matrix";
+    static const std::string COEFFICIENT_KEY = "coefficient";
+    static const std::string META_SOURCE = "data/meta.yml";
+
     class Calibrator {
 
     private:
@@ -53,8 +57,10 @@ namespace calibration {
         }
 
     public:
+
         Calibrator(std::string &source, int amount, cv::Size& size)
-                : source_(source), amount_(amount), size_(size) {};
+                : source_(source), amount_(amount), size_(size) {
+        };
 
         virtual ~Calibrator();
 
@@ -63,6 +69,10 @@ namespace calibration {
         int get_amount() const;
 
         void calibrate(cv::Mat& matrix, cv::Mat& distCoef);
+
+        static void save(cv::Mat& matrix, cv::Mat& distCoef);
+
+        static void load(cv::Mat& matrix, cv::Mat& distCoef);
     };
 }
 

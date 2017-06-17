@@ -36,10 +36,10 @@ void imshow(cv::Mat &image, std::string name) {
 }
 
 int main() {
+    /* An example of Calibrating camera with Calibrator class
     auto start = hires_clk::now();
 
     auto size = cv::Size(9, 6);
-
     std::string path = "calibration/calibration";
     cv::Mat matrix, distCoef;
     calibration::Calibrator calibrator(path, 20, size);
@@ -48,6 +48,14 @@ int main() {
     auto end = hires_clk::now();
     auto duration = duration_cast<milliseconds>(end - start).count();
     std::cout << "Calibration duration: " << duration / 1000.f << " secs \n";
+
+    // saving calibration matrix & distance coefficient
+    calibration::Calibrator::save(matrix, distCoef);
+    */
+
+    cv::Mat matrix, distCoef;
+    // loading calibration matrix & distance coefficient
+    calibration::Calibrator::load(matrix, distCoef);
 
     auto src_image = cv::imread("data/signs_vehicles_xygrad.png");
     cv::Mat dst;

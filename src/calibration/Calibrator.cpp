@@ -26,5 +26,18 @@ void calibration::Calibrator::calibrate(cv::Mat& matrix, cv::Mat& distCoef) {
     cv::calibrateCamera(object_points, image_points, size_, matrix, distCoef, rvecs, tvecs);
 }
 
+void calibration::Calibrator::save(cv::Mat &matrix, cv::Mat &distCoef) {
+    cv::FileStorage fs(META_SOURCE, cv::FileStorage::WRITE);
+    fs << MATRIX_KEY <<  matrix;
+    fs << COEFFICIENT_KEY << distCoef;
+    fs.release();
+}
+
+void calibration::Calibrator::load(cv::Mat &matrix, cv::Mat &distCoef) {
+    cv::FileStorage fs(META_SOURCE, cv::FileStorage::READ);
+    fs[MATRIX_KEY] >> matrix;
+    fs[COEFFICIENT_KEY] >> distCoef;
+    fs.release();
+}
 
 
