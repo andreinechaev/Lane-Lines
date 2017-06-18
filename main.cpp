@@ -47,6 +47,8 @@ int main() {
     imshow(grad, "Absolute Sobel Threshold");
     auto mag = lineSeeker.mag_thresh(dst, 30, 120);
     imshow(mag, "Magnitude");
+    auto dir_thresh = lineSeeker.dir_thresh(dst, 0.7, 1.3);
+    imshow(dir_thresh, "Direction");
     cv::destroyAllWindows();
 
     std::cout << "End of program" << std::endl;
