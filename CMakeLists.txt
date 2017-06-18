@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.6)
 project(LaneLines)
 
 set(CMAKE_CXX_STANDARD 14)
-set(SOURCE_FILES main.cpp src/calibration/Calibrator.cpp src/calibration/Calibrator.h)
+set(SOURCE_FILES main.cpp src/calibration/Calibrator.cpp src/calibration/Calibrator.h src/seeker/LineSeeker.cpp src/seeker/LineSeeker.h)
 
 if (!$ENV{OpenCV3_DIR})
     find_package(OpenCV REQUIRED)
