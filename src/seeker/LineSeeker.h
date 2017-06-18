@@ -16,7 +16,7 @@ namespace seeker {
         LineSeeker(int kernel_size=3): kernel_size_(kernel_size){}
         virtual ~LineSeeker(){}
 
-        cv::Mat abs_sobel_thresh(cv::Mat& src, const char orient='x', bool is_gray = false) const;
+        cv::Mat abs_sobel_thresh(cv::Mat& src, const char orient='x', int mag_max=255, bool is_gray = false) const;
         cv::Mat mag_thresh(cv::Mat& src, short mag_min=0, short mag_max=255, bool is_gray=false) const;
     };
 }

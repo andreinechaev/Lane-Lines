@@ -43,7 +43,7 @@ int main() {
 
 
     seeker::LineSeeker lineSeeker;
-    auto grad = lineSeeker.abs_sobel_thresh(dst);
+    auto grad = lineSeeker.abs_sobel_thresh(dst, 'x', 120);
     imshow(grad, "Absolute Sobel Threshold");
     auto mag = lineSeeker.mag_thresh(dst, 30, 120);
     imshow(mag, "Magnitude");
